@@ -274,12 +274,6 @@ tr:hover td {
     z-index: 1;
 }
 
-/* --- Modals --- */
-#editModal, #deleteModal {
-    backdrop-filter: blur(15px) brightness(0.8);
-    background: rgba(0, 0, 0, 0.2);
-}
-
 /* --- Animations --- */
 @keyframes liquidMove {
     0% { transform: translate(0, 0) scale(1); }
