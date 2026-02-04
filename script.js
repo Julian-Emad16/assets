@@ -341,6 +341,52 @@ function renderTable(rows) {
     lucide.createIcons();
 }
 
+// Opens the modal and stores the target lead's info
+function confirmDelete(client, project) {
+    const modal = document.getElementById('deleteModal');
+    // We'll store the identifiers in hidden fields or global variables
+    document.getElementById('deleteRowId').value = decodeURIComponent(client);
+    document.getElementById('deleteRowId').setAttribute('data-project', decodeURIComponent(project));
+    
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+}
+
+// Closes the modal
+function closeDeleteModal() {
+    const modal = document.getElementById('deleteModal');
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+}
+
+// Sends the delete request to Google Sheets
+function executeDelete() {
+    const clientName = document.getElementById('deleteRowId').value;
+    const projectName = document.getElementById('deleteRowId').getAttribute('data-project');
+
+    showLoader(true);
+    closeDeleteModal();
+
+    const payload = {
+        action: "deleteLead",
+        name: clientName,
+        project: projectName
+    };
+
+    fetch(APP_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify(payload)
+    }).then(() => {
+        const msg = currentLang === 'ar' ? "تم الحذف بنجاح" : "Deleted successfully";
+        alert(msg);
+        loadData(); // Refresh the table
+    }).catch(err => {
+        console.error("Delete Error:", err);
+        showLoader(false);
+    });
+}
+
 function filterData() {
     const term = document.getElementById('searchFilter').value.toLowerCase();
     const stat = document.getElementById('statusFilter').value;
