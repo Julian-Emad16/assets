@@ -125,17 +125,17 @@ function updateUI() {
     document.getElementById('authSubmitBtn').innerText = authMode === 'login' ? t.signIn : t.createAccount;
     document.getElementById('questionText').innerText = authMode === 'login' ? t.questionLogin : t.questionSignup;
     document.getElementById('toggleText').innerText = authMode === 'login' ? t.createAccount : t.backLogin;
-    
+
     // Login Labels
     document.getElementById('userLabel').innerText = t.userLabel;
     document.getElementById('passLabel').innerText = t.passLabel;
     document.getElementById('repeatPassLabel').innerText = t.repeatPassLabel;
-    
+
     // Login Placeholders
     document.getElementById('authUser').placeholder = t.userPlace;
     document.getElementById('authPass').placeholder = t.passPlace;
     document.getElementById('authPassRepeat').placeholder = t.repeatPassPlace;
-    
+
     // Dashboard Placeholders
     document.getElementById('projectName').placeholder = t.projectPlace;
     document.getElementById('location').placeholder = t.locationPlace;
@@ -147,13 +147,13 @@ function updateUI() {
     // Controls
     document.getElementById('modeLabel').innerText = currentMode === 'dark' ? t.lightMode : t.darkMode;
     document.getElementById('langLabel').innerText = t.langSwitch;
-    
+
     // Batch updates for data-i18n elements
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (t[key]) el.innerText = t[key];
     });
-    
+
     const currencyEl = document.getElementById('currencyLabel');
     if (currencyEl) {
         currencyEl.innerText = t.currLabel;
@@ -167,22 +167,6 @@ function updateUI() {
             currencyEl.style.direction = 'ltr';
         }
     }
-    
-    // Select Menus (Status)
-    const statusSelect = document.getElementById('clientStatus');
-    const filterSelect = document.getElementById('statusFilter');
-    
-    if (statusSelect) {
-        statusSelect.innerHTML = statusOptions[currentLang].map((s, i) => 
-            `<option value="${statusOptions.en[i]}">${s}</option>`).join('');
-    }
-    
-    if (filterSelect) {
-        filterSelect.innerHTML = `<option value="All">${t.all}</option>` + 
-            statusOptions[currentLang].map((s, i) => 
-            `<option value="${statusOptions.en[i]}">${s}</option>`).join('');
-    }
-}
 
     // Select Menus (Status)
     const statusSelect = document.getElementById('clientStatus');
@@ -200,6 +184,11 @@ function updateUI() {
     }
 }
 
+function toggleAuthMode() {
+    authMode = authMode === 'login' ? 'signup' : 'login';
+    document.getElementById('repeatPasswordGroup').classList.toggle('hidden', authMode === 'login');
+    updateUI();
+}
 
 function toggleDarkMode() {
     currentMode = currentMode === 'light' ? 'dark' : 'light';
@@ -226,23 +215,41 @@ function handleAuth() {
     const user = document.getElementById('authUser').value.trim();
     const pass = document.getElementById('authPass').value.trim();
     
+    // Translation-friendly alerts (Optional, but good for your Arabic support)
     if (!user || !pass) return alert(currentLang === 'ar' ? "يرجى ملء جميع الحقول" : "Please fill all fields");
     
     showLoader(true);
+    const action = authMode === 'login' ? 'login' : 'signup';
     
-    // Always use 'login' action
-    fetch(`${AUTH_URL}?action=login&user=${user}&pass=${pass}`)
+    // Note: We use GET for login to match your doGet script, 
+    // and POST for signup if you prefer, but sticking to your current logic:
+    fetch(`${AUTH_URL}?action=${action}&user=${user}&pass=${pass}`)
     .then(res => res.text())
     .then(res => {
         if (res.includes('success')) {
+            // res looks like: "success|dark|admin"
             const parts = res.split('|');
+            const userMode = parts[1] || 'light';
+            const userRole = parts[2] || 'user';
+
+            // 1. Store the username
             sessionStorage.setItem('crm_user', user);
-            sessionStorage.setItem('crm_role', parts[2] || 'user');
-            localStorage.setItem('crm_mode', parts[1] || 'light');
+            
+            // 2. Store the role (essential for your isAdmin() check)
+            sessionStorage.setItem('crm_role', userRole);
+            
+            // 3. Store the theme preference
+            localStorage.setItem('crm_mode', userMode);
+            
             location.reload();
         } else {
             showLoader(false);
-            alert(currentLang === 'ar' ? "بيانات الدخول غير صحيحة" : "Invalid Login Credentials");
+            // Handle specific error messages
+            if (res === 'exists') {
+                alert(currentLang === 'ar' ? "المستخدم موجود بالفعل" : "User already exists");
+            } else {
+                alert(currentLang === 'ar' ? "بيانات الدخول غير صحيحة" : "Invalid Login Credentials");
+            }
         }
     })
     .catch(err => {
@@ -263,13 +270,7 @@ function loadData() {
             allRows = data.slice(1).filter(r => isAdmin() || r[0] == currentUser);
             renderTable(allRows);
             showLoader(false);
-            const appContent = document.getElementById('appContent');
-            if (appContent) appContent.classList.add('loaded');
-        })
-        .catch(err => {
-            console.error("Fetch error:", err);
-            showLoader(false); // Kill the loader if the network fails
-            alert("Failed to load data.");
+            document.getElementById('appContent').classList.add('loaded');
         });
 }
 
