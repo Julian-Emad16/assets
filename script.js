@@ -180,11 +180,6 @@ function updateUI() {
     }
 }
 
-function toggleAuthMode() {
-    authMode = authMode === 'login' ? 'signup' : 'login';
-    document.getElementById('repeatPasswordGroup').classList.toggle('hidden', authMode === 'login');
-    updateUI();
-}
 
 function toggleDarkMode() {
     currentMode = currentMode === 'light' ? 'dark' : 'light';
@@ -211,41 +206,23 @@ function handleAuth() {
     const user = document.getElementById('authUser').value.trim();
     const pass = document.getElementById('authPass').value.trim();
     
-    // Translation-friendly alerts (Optional, but good for your Arabic support)
     if (!user || !pass) return alert(currentLang === 'ar' ? "يرجى ملء جميع الحقول" : "Please fill all fields");
     
     showLoader(true);
-    const action = authMode === 'login' ? 'login' : 'signup';
     
-    // Note: We use GET for login to match your doGet script, 
-    // and POST for signup if you prefer, but sticking to your current logic:
-    fetch(`${AUTH_URL}?action=${action}&user=${user}&pass=${pass}`)
+    // Always use 'login' action
+    fetch(`${AUTH_URL}?action=login&user=${user}&pass=${pass}`)
     .then(res => res.text())
     .then(res => {
         if (res.includes('success')) {
-            // res looks like: "success|dark|admin"
             const parts = res.split('|');
-            const userMode = parts[1] || 'light';
-            const userRole = parts[2] || 'user';
-
-            // 1. Store the username
             sessionStorage.setItem('crm_user', user);
-            
-            // 2. Store the role (essential for your isAdmin() check)
-            sessionStorage.setItem('crm_role', userRole);
-            
-            // 3. Store the theme preference
-            localStorage.setItem('crm_mode', userMode);
-            
+            sessionStorage.setItem('crm_role', parts[2] || 'user');
+            localStorage.setItem('crm_mode', parts[1] || 'light');
             location.reload();
         } else {
             showLoader(false);
-            // Handle specific error messages
-            if (res === 'exists') {
-                alert(currentLang === 'ar' ? "المستخدم موجود بالفعل" : "User already exists");
-            } else {
-                alert(currentLang === 'ar' ? "بيانات الدخول غير صحيحة" : "Invalid Login Credentials");
-            }
+            alert(currentLang === 'ar' ? "بيانات الدخول غير صحيحة" : "Invalid Login Credentials");
         }
     })
     .catch(err => {
@@ -266,7 +243,13 @@ function loadData() {
             allRows = data.slice(1).filter(r => isAdmin() || r[0] == currentUser);
             renderTable(allRows);
             showLoader(false);
-            document.getElementById('appContent').classList.add('loaded');
+            const appContent = document.getElementById('appContent');
+            if (appContent) appContent.classList.add('loaded');
+        })
+        .catch(err => {
+            console.error("Fetch error:", err);
+            showLoader(false); // Kill the loader if the network fails
+            alert("Failed to load data.");
         });
 }
 
