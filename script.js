@@ -313,9 +313,6 @@ function renderTable(rows) {
                 <button title="Edit" class="action-btn btn-edit" onclick="openEditModal('${encodedRow}')">
                     <i data-lucide="edit-3" style="width:16px;"></i>
                 </button>
-                <button title="Delete" class="action-btn btn-delete" onclick="confirmDelete('${r[0]}')">
-                    <i data-lucide="x" style="width:16px;"></i>
-                </button>
             </div>
         `;
 
@@ -339,58 +336,6 @@ function renderTable(rows) {
     const totalValue = rows.reduce((sum, r) => sum + (Number(r[7]) || 0), 0);
     document.getElementById('stat-active').innerText = totalValue.toLocaleString();
     lucide.createIcons();
-}
-
-// 1. Move this variable to the top of your script (with your other let/const)
-let deleteTargetId = ""; 
-
-// 2. Add these to the very bottom of your script file
-function confirmDelete(idValue) {
-    console.log("Attempting to delete ID:", idValue); // Debug log
-    deleteTargetId = idValue;
-    const modal = document.getElementById('deleteModal');
-    if (modal) {
-        modal.style.display = 'flex'; 
-        if (window.lucide) lucide.createIcons();
-    } else {
-        console.error("Could not find deleteModal element");
-    }
-}
-
-function closeDeleteModal() {
-    const modal = document.getElementById('deleteModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
-}
-
-function executeDelete() {
-    if (!deleteTargetId) return;
-    
-    showLoader(true);
-    closeDeleteModal();
-
-    const payload = {
-        action: "deleteLead",
-        id: deleteTargetId 
-    };
-
-    fetch(APP_URL, {
-        method: 'POST',
-        mode: 'no-cors', 
-        body: JSON.stringify(payload)
-    })
-    .then(() => {
-        // Since it's no-cors, we manually trigger the UI refresh
-        setTimeout(() => {
-            alert(currentLang === 'ar' ? "تم الإجراء بنجاح" : "Action Completed");
-            loadData(); 
-        }, 1000);
-    })
-    .catch(err => {
-        console.error("Delete Error:", err);
-        showLoader(false);
-    });
 }
 
 function filterData() {
