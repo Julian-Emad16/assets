@@ -120,21 +120,17 @@ function updateUI() {
     
     // Global & Auth Text
     document.getElementById('loadingText').innerText = t.loading;
-    document.getElementById('authTitle').innerText = authMode === 'login' ? t.signIn : t.createAccount;
-    document.getElementById('authDesc').innerText = authMode === 'login' ? t.authDescLogin : t.authDescSignup;
-    document.getElementById('authSubmitBtn').innerText = authMode === 'login' ? t.signIn : t.createAccount;
-    document.getElementById('questionText').innerText = authMode === 'login' ? t.questionLogin : t.questionSignup;
-    document.getElementById('toggleText').innerText = authMode === 'login' ? t.createAccount : t.backLogin;
 
     // Login Labels
     document.getElementById('userLabel').innerText = t.userLabel;
     document.getElementById('passLabel').innerText = t.passLabel;
-    document.getElementById('repeatPassLabel').innerText = t.repeatPassLabel;
 
     // Login Placeholders
     document.getElementById('authUser').placeholder = t.userPlace;
     document.getElementById('authPass').placeholder = t.passPlace;
-    document.getElementById('authPassRepeat').placeholder = t.repeatPassPlace;
+    document.getElementById('authTitle').innerText = t.signIn;
+    document.getElementById('authDesc').innerText = t.authDescLogin;
+    document.getElementById('authSubmitBtn').innerText = t.signIn;
 
     // Dashboard Placeholders
     document.getElementById('projectName').placeholder = t.projectPlace;
