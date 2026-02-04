@@ -313,7 +313,7 @@ function renderTable(rows) {
                 <button title="Edit" class="action-btn btn-edit" onclick="openEditModal('${encodedRow}')">
                     <i data-lucide="edit-3" style="width:16px;"></i>
                 </button>
-                <button title="Delete" class="action-btn btn-delete" onclick="confirmDelete('${r[0]}')">
+                <button title="Delete" class="action-btn btn-delete" onclick="confirmDelete('${encodeURIComponent(clientName)}', '${encodeURIComponent(projectName)}')">
                     <i data-lucide="x" style="width:16px;"></i>
                 </button>
             </div>
