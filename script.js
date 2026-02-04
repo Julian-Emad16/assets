@@ -313,7 +313,7 @@ function renderTable(rows) {
                 <button title="Edit" class="action-btn btn-edit" onclick="openEditModal('${encodedRow}')">
                     <i data-lucide="edit-3" style="width:16px;"></i>
                 </button>
-                <button title="Delete" class="action-btn btn-delete" onclick="confirmDelete('${encodeURIComponent(clientName)}', '${encodeURIComponent(projectName)}')">
+                <button title="Delete" class="action-btn btn-delete" onclick="confirmDelete('${r[0]}')">
                     <i data-lucide="x" style="width:16px;"></i>
                 </button>
             </div>
@@ -341,49 +341,56 @@ function renderTable(rows) {
     lucide.createIcons();
 }
 
-// Opens the modal and stores the target lead's info
-function confirmDelete(client, project) {
-    const modal = document.getElementById('deleteModal');
-    // We'll store the identifiers in hidden fields or global variables
-    document.getElementById('deleteRowId').value = decodeURIComponent(client);
-    document.getElementById('deleteRowId').setAttribute('data-project', decodeURIComponent(project));
+let deleteTargetUser = ""; 
+
+function confirmDelete(userId) {
+    // This captures the value from Column A (r[0])
+    deleteTargetUser = userId;
     
-    modal.classList.remove('hidden');
-    modal.style.display = 'flex';
+    const modal = document.getElementById('deleteModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
+        // Re-initialize icons for the trash icon inside the modal
+        if (window.lucide) lucide.createIcons(); 
+    }
 }
 
-// Closes the modal
 function closeDeleteModal() {
     const modal = document.getElementById('deleteModal');
-    modal.classList.add('hidden');
-    modal.style.display = 'none';
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+    }
 }
 
-// Sends the delete request to Google Sheets
 function executeDelete() {
-    const clientName = document.getElementById('deleteRowId').value;
-    const projectName = document.getElementById('deleteRowId').getAttribute('data-project');
-
+    if (!deleteTargetUser) return;
+    
     showLoader(true);
-    closeDeleteModal();
-
+    
+    // We use "id" as the key because your doPost uses: data.id
     const payload = {
         action: "deleteLead",
-        name: clientName,
-        project: projectName
+        id: deleteTargetUser 
     };
 
     fetch(APP_URL, {
         method: 'POST',
-        mode: 'no-cors',
+        mode: 'no-cors', 
         body: JSON.stringify(payload)
-    }).then(() => {
-        const msg = currentLang === 'ar' ? "تم الحذف بنجاح" : "Deleted successfully";
+    })
+    .then(() => {
+        closeDeleteModal();
+        // Success message
+        const msg = currentLang === 'ar' ? "تم الحذف بنجاح" : "Deleted Successfully";
         alert(msg);
         loadData(); // Refresh the table
-    }).catch(err => {
+    })
+    .catch(err => {
         console.error("Delete Error:", err);
         showLoader(false);
+        alert("Error during deletion.");
     });
 }
 
