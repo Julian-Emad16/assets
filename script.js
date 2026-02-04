@@ -116,54 +116,74 @@ function updateUI() {
     checkMobile();
     const t = translations[currentLang];
     if (window.lucide) lucide.createIcons();
+    const isAr = currentLang === 'ar';
     
-    // Helper function to prevent "null" errors
-    const safeSet = (id, prop, value) => {
+    // Global & Auth Text
+    const loadingText = document.getElementById('loadingText');
+    if (loadingText) loadingText.innerText = t.loading;
+
+    // LOGIN LABELS - These are the most likely causes of your error
+    const userLabel = document.getElementById('userLabel');
+    if (userLabel) userLabel.innerText = t.userLabel;
+
+    const passLabel = document.getElementById('passLabel');
+    if (passLabel) passLabel.innerText = t.passLabel;
+
+    // INPUTS & BUTTONS
+    const authUser = document.getElementById('authUser');
+    if (authUser) authUser.placeholder = t.userPlace;
+
+    const authPass = document.getElementById('authPass');
+    if (authPass) authPass.placeholder = t.passPlace;
+
+    const authTitle = document.getElementById('authTitle');
+    if (authTitle) authTitle.innerText = t.signIn;
+
+    const authDesc = document.getElementById('authDesc');
+    if (authDesc) authDesc.innerText = t.authDescLogin;
+
+    const authSubmitBtn = document.getElementById('authSubmitBtn');
+    if (authSubmitBtn) authSubmitBtn.innerText = t.signIn;
+
+    // DASHBOARD ELEMENTS
+    const elementsToUpdate = [
+        ['projectName', 'placeholder', t.projectPlace],
+        ['location', 'placeholder', t.locationPlace],
+        ['clientName', 'placeholder', t.namePlace],
+        ['clientPhone', 'placeholder', t.phonePlace],
+        ['clientValue', 'placeholder', t.valuePlace],
+        ['searchFilter', 'placeholder', t.searchPlace],
+        ['modeLabel', 'innerText', currentMode === 'dark' ? t.lightMode : t.darkMode],
+        ['langLabel', 'innerText', t.langSwitch]
+    ];
+
+    elementsToUpdate.forEach(([id, prop, value]) => {
         const el = document.getElementById(id);
         if (el) el[prop] = value;
-    };
+    });
 
-    // Global & Auth Text
-    safeSet('loadingText', 'innerText', t.loading);
-
-    // Login Form (These are likely causing your crash)
-    safeSet('userLabel', 'innerText', t.userLabel);
-    safeSet('passLabel', 'innerText', t.passLabel);
-    safeSet('authUser', 'placeholder', t.userPlace);
-    safeSet('authPass', 'placeholder', t.passPlace);
-    safeSet('authTitle', 'innerText', t.signIn);
-    safeSet('authDesc', 'innerText', t.authDescLogin);
-    safeSet('authSubmitBtn', 'innerText', t.signIn);
-
-    // Dashboard Inputs
-    safeSet('projectName', 'placeholder', t.projectPlace);
-    safeSet('location', 'placeholder', t.locationPlace);
-    safeSet('clientName', 'placeholder', t.namePlace);
-    safeSet('clientPhone', 'placeholder', t.phonePlace);
-    safeSet('clientValue', 'placeholder', t.valuePlace);
-    safeSet('searchFilter', 'placeholder', t.searchPlace);
-    
-    // Theme & Language
-    safeSet('modeLabel', 'innerText', currentMode === 'dark' ? t.lightMode : t.darkMode);
-    safeSet('langLabel', 'innerText', t.langSwitch);
-
-    // Batch updates for elements using data-i18n
+    // BATCH UPDATES
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (t[key]) el.innerText = t[key];
     });
 
-    // Handle Currency Label Positioning
+    // CURRENCY LABEL
     const currencyEl = document.getElementById('currencyLabel');
     if (currencyEl) {
         currencyEl.innerText = t.currLabel;
-        const isAr = currentLang === 'ar';
-        currencyEl.style.right = isAr ? 'auto' : '15px';
-        currencyEl.style.left = isAr ? '15px' : 'auto';
-        currencyEl.style.direction = isAr ? 'rtl' : 'ltr';
+        if (isAr) {
+            currencyEl.style.right = 'auto';
+            currencyEl.style.left = '15px';
+            currencyEl.style.direction = 'rtl';
+        } else {
+            currencyEl.style.left = 'auto';
+            currencyEl.style.right = '15px';
+            currencyEl.style.direction = 'ltr';
+        }
     }
 
-    // Dropdown Menus
+    // DROPDOWNS
     const statusSelect = document.getElementById('clientStatus');
     const filterSelect = document.getElementById('statusFilter');
     
