@@ -115,75 +115,60 @@ function checkMobile() {
 function updateUI() {
     checkMobile();
     const t = translations[currentLang];
-    if (window.lucide) lucide.createIcons();
+    lucide.createIcons();
     const isAr = currentLang === 'ar';
     
     // Global & Auth Text
-    const loadingText = document.getElementById('loadingText');
-    if (loadingText) loadingText.innerText = t.loading;
-
-    // LOGIN LABELS - These are the most likely causes of your error
-    const userLabel = document.getElementById('userLabel');
-    if (userLabel) userLabel.innerText = t.userLabel;
-
-    const passLabel = document.getElementById('passLabel');
-    if (passLabel) passLabel.innerText = t.passLabel;
-
-    // INPUTS & BUTTONS
-    const authUser = document.getElementById('authUser');
-    if (authUser) authUser.placeholder = t.userPlace;
-
-    const authPass = document.getElementById('authPass');
-    if (authPass) authPass.placeholder = t.passPlace;
-
-    const authTitle = document.getElementById('authTitle');
-    if (authTitle) authTitle.innerText = t.signIn;
-
-    const authDesc = document.getElementById('authDesc');
-    if (authDesc) authDesc.innerText = t.authDescLogin;
-
-    const authSubmitBtn = document.getElementById('authSubmitBtn');
-    if (authSubmitBtn) authSubmitBtn.innerText = t.signIn;
-
-    // DASHBOARD ELEMENTS
-    const elementsToUpdate = [
-        ['projectName', 'placeholder', t.projectPlace],
-        ['location', 'placeholder', t.locationPlace],
-        ['clientName', 'placeholder', t.namePlace],
-        ['clientPhone', 'placeholder', t.phonePlace],
-        ['clientValue', 'placeholder', t.valuePlace],
-        ['searchFilter', 'placeholder', t.searchPlace],
-        ['modeLabel', 'innerText', currentMode === 'dark' ? t.lightMode : t.darkMode],
-        ['langLabel', 'innerText', t.langSwitch]
-    ];
-
-    elementsToUpdate.forEach(([id, prop, value]) => {
-        const el = document.getElementById(id);
-        if (el) el[prop] = value;
-    });
-
-    // BATCH UPDATES
+    document.getElementById('loadingText').innerText = t.loading;
+    document.getElementById('authTitle').innerText = authMode === 'login' ? t.signIn : t.createAccount;
+    document.getElementById('authDesc').innerText = authMode === 'login' ? t.authDescLogin : t.authDescSignup;
+    document.getElementById('authSubmitBtn').innerText = authMode === 'login' ? t.signIn : t.createAccount;
+    document.getElementById('questionText').innerText = authMode === 'login' ? t.questionLogin : t.questionSignup;
+    document.getElementById('toggleText').innerText = authMode === 'login' ? t.createAccount : t.backLogin;
+    
+    // Login Labels
+    document.getElementById('userLabel').innerText = t.userLabel;
+    document.getElementById('passLabel').innerText = t.passLabel;
+    document.getElementById('repeatPassLabel').innerText = t.repeatPassLabel;
+    
+    // Login Placeholders
+    document.getElementById('authUser').placeholder = t.userPlace;
+    document.getElementById('authPass').placeholder = t.passPlace;
+    document.getElementById('authPassRepeat').placeholder = t.repeatPassPlace;
+    
+    // Dashboard Placeholders
+    document.getElementById('projectName').placeholder = t.projectPlace;
+    document.getElementById('location').placeholder = t.locationPlace;
+    document.getElementById('clientName').placeholder = t.namePlace;
+    document.getElementById('clientPhone').placeholder = t.phonePlace;
+    document.getElementById('clientValue').placeholder = t.valuePlace;
+    document.getElementById('searchFilter').placeholder = t.searchPlace;
+    
+    // Controls
+    document.getElementById('modeLabel').innerText = currentMode === 'dark' ? t.lightMode : t.darkMode;
+    document.getElementById('langLabel').innerText = t.langSwitch;
+    
+    // Batch updates for data-i18n elements
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (t[key]) el.innerText = t[key];
     });
-
-    // CURRENCY LABEL
+    
     const currencyEl = document.getElementById('currencyLabel');
     if (currencyEl) {
         currencyEl.innerText = t.currLabel;
         if (isAr) {
-            currencyEl.style.right = 'auto';
-            currencyEl.style.left = '15px';
+            currencyEl.style.right = 'auto'; // Clear the right position
+            currencyEl.style.left = '15px';  // Move to the left
             currencyEl.style.direction = 'rtl';
         } else {
-            currencyEl.style.left = 'auto';
-            currencyEl.style.right = '15px';
+            currencyEl.style.left = 'auto';  // Clear the left position
+            currencyEl.style.right = '15px'; // Move back to the right
             currencyEl.style.direction = 'ltr';
         }
     }
-
-    // DROPDOWNS
+    
+    // Select Menus (Status)
     const statusSelect = document.getElementById('clientStatus');
     const filterSelect = document.getElementById('statusFilter');
     
