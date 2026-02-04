@@ -341,17 +341,12 @@ function renderTable(rows) {
     lucide.createIcons();
 }
 
-let deleteTargetUser = ""; 
-
-function confirmDelete(userId) {
-    deleteTargetUser = userId;
+function confirmDelete(idValue) {
+    // idValue is r[0] from your table (Column A)
+    deleteTargetId = idValue;
     const modal = document.getElementById('deleteModal');
     if (modal) {
-        // Remove the class AND force the display flex
-        modal.classList.remove('hidden');
-        modal.style.setProperty('display', 'flex', 'important');
-        
-        // Refresh icons so trash-2 shows up
+        modal.style.display = 'flex'; // Force visibility
         if (window.lucide) lucide.createIcons();
     }
 }
@@ -359,35 +354,40 @@ function confirmDelete(userId) {
 function closeDeleteModal() {
     const modal = document.getElementById('deleteModal');
     if (modal) {
-        modal.classList.add('hidden');
-        modal.style.setProperty('display', 'none', 'important');
+        modal.style.display = 'none';
     }
 }
 
 function executeDelete() {
-    if (!deleteTargetUser) return;
+    if (!deleteTargetId) return;
     
     showLoader(true);
-    
-    // This matches your doPost: if (values[i][0].toString() === data.id.toString())
+    closeDeleteModal();
+
+    // Payload matches your doPost requirement: data.action and data.id
     const payload = {
         action: "deleteLead",
-        id: deleteTargetUser 
+        id: deleteTargetId 
     };
 
     fetch(APP_URL, {
         method: 'POST',
-        mode: 'no-cors', 
+        mode: 'no-cors', // Apps Script requires this for cross-domain POST
+        cache: 'no-cache',
         body: JSON.stringify(payload)
     })
     .then(() => {
-        closeDeleteModal();
-        alert(currentLang === 'ar' ? "تم الحذف بنجاح" : "Deleted Successfully");
-        loadData(); 
+        // Because of no-cors, we don't wait for a response body
+        // We just assume success after the request is sent
+        setTimeout(() => {
+            alert(currentLang === 'ar' ? "تم الحذف بنجاح" : "Action Completed");
+            loadData(); // Refresh table
+        }, 1000);
     })
     .catch(err => {
         console.error("Delete Error:", err);
         showLoader(false);
+        alert("Error connecting to server.");
     });
 }
 
