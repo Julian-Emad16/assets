@@ -115,34 +115,41 @@ function checkMobile() {
 function updateUI() {
     checkMobile();
     const t = translations[currentLang];
-    lucide.createIcons();
+    if (window.lucide) lucide.createIcons();
+    
     const isAr = currentLang === 'ar';
     
-    // Global & Auth Text
-    document.getElementById('loadingText').innerText = t.loading;
+    // Helper function to safely update text/placeholders
+    const safeSet = (id, prop, value) => {
+        const el = document.getElementById(id);
+        if (el) el[prop] = value;
+    };
 
-    // Login Labels
-    document.getElementById('userLabel').innerText = t.userLabel;
-    document.getElementById('passLabel').innerText = t.passLabel;
+    // Global & Auth Text
+    safeSet('loadingText', 'innerText', t.loading);
+
+    // Login Labels (The likely crash points)
+    safeSet('userLabel', 'innerText', t.userLabel);
+    safeSet('passLabel', 'innerText', t.passLabel);
 
     // Login Placeholders
-    document.getElementById('authUser').placeholder = t.userPlace;
-    document.getElementById('authPass').placeholder = t.passPlace;
-    document.getElementById('authTitle').innerText = t.signIn;
-    document.getElementById('authDesc').innerText = t.authDescLogin;
-    document.getElementById('authSubmitBtn').innerText = t.signIn;
+    safeSet('authUser', 'placeholder', t.userPlace);
+    safeSet('authPass', 'placeholder', t.passPlace);
+    safeSet('authTitle', 'innerText', t.signIn);
+    safeSet('authDesc', 'innerText', t.authDescLogin);
+    safeSet('authSubmitBtn', 'innerText', t.signIn);
 
     // Dashboard Placeholders
-    document.getElementById('projectName').placeholder = t.projectPlace;
-    document.getElementById('location').placeholder = t.locationPlace;
-    document.getElementById('clientName').placeholder = t.namePlace;
-    document.getElementById('clientPhone').placeholder = t.phonePlace;
-    document.getElementById('clientValue').placeholder = t.valuePlace;
-    document.getElementById('searchFilter').placeholder = t.searchPlace;
+    safeSet('projectName', 'placeholder', t.projectPlace);
+    safeSet('location', 'placeholder', t.locationPlace);
+    safeSet('clientName', 'placeholder', t.namePlace);
+    safeSet('clientPhone', 'placeholder', t.phonePlace);
+    safeSet('clientValue', 'placeholder', t.valuePlace);
+    safeSet('searchFilter', 'placeholder', t.searchPlace);
     
     // Controls
-    document.getElementById('modeLabel').innerText = currentMode === 'dark' ? t.lightMode : t.darkMode;
-    document.getElementById('langLabel').innerText = t.langSwitch;
+    safeSet('modeLabel', 'innerText', currentMode === 'dark' ? t.lightMode : t.darkMode);
+    safeSet('langLabel', 'innerText', t.langSwitch);
 
     // Batch updates for data-i18n elements
     document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -153,16 +160,26 @@ function updateUI() {
     const currencyEl = document.getElementById('currencyLabel');
     if (currencyEl) {
         currencyEl.innerText = t.currLabel;
-        if (isAr) {
-            currencyEl.style.right = 'auto'; // Clear the right position
-            currencyEl.style.left = '15px';  // Move to the left
-            currencyEl.style.direction = 'rtl';
-        } else {
-            currencyEl.style.left = 'auto';  // Clear the left position
-            currencyEl.style.right = '15px'; // Move back to the right
-            currencyEl.style.direction = 'ltr';
-        }
+        currencyEl.style.right = isAr ? 'auto' : '15px';
+        currencyEl.style.left = isAr ? '15px' : 'auto';
+        currencyEl.style.direction = isAr ? 'rtl' : 'ltr';
     }
+
+    // Select Menus (Status)
+    const statusSelect = document.getElementById('clientStatus');
+    const filterSelect = document.getElementById('statusFilter');
+    
+    if (statusSelect) {
+        statusSelect.innerHTML = statusOptions[currentLang].map((s, i) => 
+            `<option value="${statusOptions.en[i]}">${s}</option>`).join('');
+    }
+    
+    if (filterSelect) {
+        filterSelect.innerHTML = `<option value="All">${t.all}</option>` + 
+            statusOptions[currentLang].map((s, i) => 
+            `<option value="${statusOptions.en[i]}">${s}</option>`).join('');
+    }
+}
 
     // Select Menus (Status)
     const statusSelect = document.getElementById('clientStatus');
