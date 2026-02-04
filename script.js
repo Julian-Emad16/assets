@@ -341,13 +341,19 @@ function renderTable(rows) {
     lucide.createIcons();
 }
 
+// 1. Move this variable to the top of your script (with your other let/const)
+let deleteTargetId = ""; 
+
+// 2. Add these to the very bottom of your script file
 function confirmDelete(idValue) {
-    // idValue is r[0] from your table (Column A)
+    console.log("Attempting to delete ID:", idValue); // Debug log
     deleteTargetId = idValue;
     const modal = document.getElementById('deleteModal');
     if (modal) {
-        modal.style.display = 'flex'; // Force visibility
+        modal.style.display = 'flex'; 
         if (window.lucide) lucide.createIcons();
+    } else {
+        console.error("Could not find deleteModal element");
     }
 }
 
@@ -364,7 +370,6 @@ function executeDelete() {
     showLoader(true);
     closeDeleteModal();
 
-    // Payload matches your doPost requirement: data.action and data.id
     const payload = {
         action: "deleteLead",
         id: deleteTargetId 
@@ -372,22 +377,19 @@ function executeDelete() {
 
     fetch(APP_URL, {
         method: 'POST',
-        mode: 'no-cors', // Apps Script requires this for cross-domain POST
-        cache: 'no-cache',
+        mode: 'no-cors', 
         body: JSON.stringify(payload)
     })
     .then(() => {
-        // Because of no-cors, we don't wait for a response body
-        // We just assume success after the request is sent
+        // Since it's no-cors, we manually trigger the UI refresh
         setTimeout(() => {
-            alert(currentLang === 'ar' ? "تم الحذف بنجاح" : "Action Completed");
-            loadData(); // Refresh table
+            alert(currentLang === 'ar' ? "تم الإجراء بنجاح" : "Action Completed");
+            loadData(); 
         }, 1000);
     })
     .catch(err => {
         console.error("Delete Error:", err);
         showLoader(false);
-        alert("Error connecting to server.");
     });
 }
 
