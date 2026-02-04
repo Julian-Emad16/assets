@@ -344,15 +344,15 @@ function renderTable(rows) {
 let deleteTargetUser = ""; 
 
 function confirmDelete(userId) {
-    // This captures the value from Column A (r[0])
     deleteTargetUser = userId;
-    
     const modal = document.getElementById('deleteModal');
     if (modal) {
+        // Remove the class AND force the display flex
         modal.classList.remove('hidden');
-        modal.style.display = 'flex';
-        // Re-initialize icons for the trash icon inside the modal
-        if (window.lucide) lucide.createIcons(); 
+        modal.style.setProperty('display', 'flex', 'important');
+        
+        // Refresh icons so trash-2 shows up
+        if (window.lucide) lucide.createIcons();
     }
 }
 
@@ -360,7 +360,7 @@ function closeDeleteModal() {
     const modal = document.getElementById('deleteModal');
     if (modal) {
         modal.classList.add('hidden');
-        modal.style.display = 'none';
+        modal.style.setProperty('display', 'none', 'important');
     }
 }
 
@@ -369,7 +369,7 @@ function executeDelete() {
     
     showLoader(true);
     
-    // We use "id" as the key because your doPost uses: data.id
+    // This matches your doPost: if (values[i][0].toString() === data.id.toString())
     const payload = {
         action: "deleteLead",
         id: deleteTargetUser 
@@ -382,15 +382,12 @@ function executeDelete() {
     })
     .then(() => {
         closeDeleteModal();
-        // Success message
-        const msg = currentLang === 'ar' ? "تم الحذف بنجاح" : "Deleted Successfully";
-        alert(msg);
-        loadData(); // Refresh the table
+        alert(currentLang === 'ar' ? "تم الحذف بنجاح" : "Deleted Successfully");
+        loadData(); 
     })
     .catch(err => {
         console.error("Delete Error:", err);
         showLoader(false);
-        alert("Error during deletion.");
     });
 }
 
