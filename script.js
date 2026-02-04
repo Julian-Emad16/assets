@@ -184,6 +184,12 @@ function updateUI() {
     }
 }
 
+function toggleAuthMode() {
+    authMode = authMode === 'login' ? 'signup' : 'login';
+    document.getElementById('repeatPasswordGroup').classList.toggle('hidden', authMode === 'login');
+    updateUI();
+}
+
 function toggleDarkMode() {
     currentMode = currentMode === 'light' ? 'dark' : 'light';
     applyMode(currentMode);
