@@ -117,9 +117,7 @@ function updateUI() {
     const t = translations[currentLang];
     if (window.lucide) lucide.createIcons();
     
-    const isAr = currentLang === 'ar';
-    
-    // Helper function to safely update text/placeholders
+    // Helper function to prevent "null" errors
     const safeSet = (id, prop, value) => {
         const el = document.getElementById(id);
         if (el) el[prop] = value;
@@ -128,18 +126,16 @@ function updateUI() {
     // Global & Auth Text
     safeSet('loadingText', 'innerText', t.loading);
 
-    // Login Labels (The likely crash points)
+    // Login Form (These are likely causing your crash)
     safeSet('userLabel', 'innerText', t.userLabel);
     safeSet('passLabel', 'innerText', t.passLabel);
-
-    // Login Placeholders
     safeSet('authUser', 'placeholder', t.userPlace);
     safeSet('authPass', 'placeholder', t.passPlace);
     safeSet('authTitle', 'innerText', t.signIn);
     safeSet('authDesc', 'innerText', t.authDescLogin);
     safeSet('authSubmitBtn', 'innerText', t.signIn);
 
-    // Dashboard Placeholders
+    // Dashboard Inputs
     safeSet('projectName', 'placeholder', t.projectPlace);
     safeSet('location', 'placeholder', t.locationPlace);
     safeSet('clientName', 'placeholder', t.namePlace);
@@ -147,25 +143,27 @@ function updateUI() {
     safeSet('clientValue', 'placeholder', t.valuePlace);
     safeSet('searchFilter', 'placeholder', t.searchPlace);
     
-    // Controls
+    // Theme & Language
     safeSet('modeLabel', 'innerText', currentMode === 'dark' ? t.lightMode : t.darkMode);
     safeSet('langLabel', 'innerText', t.langSwitch);
 
-    // Batch updates for data-i18n elements
+    // Batch updates for elements using data-i18n
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (t[key]) el.innerText = t[key];
     });
 
+    // Handle Currency Label Positioning
     const currencyEl = document.getElementById('currencyLabel');
     if (currencyEl) {
         currencyEl.innerText = t.currLabel;
+        const isAr = currentLang === 'ar';
         currencyEl.style.right = isAr ? 'auto' : '15px';
         currencyEl.style.left = isAr ? '15px' : 'auto';
         currencyEl.style.direction = isAr ? 'rtl' : 'ltr';
     }
 
-    // Select Menus (Status)
+    // Dropdown Menus
     const statusSelect = document.getElementById('clientStatus');
     const filterSelect = document.getElementById('statusFilter');
     
