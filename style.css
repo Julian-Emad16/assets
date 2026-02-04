@@ -159,8 +159,11 @@ body.dark-mode select.modern-input {
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
     border: 1px solid rgba(255, 255, 255, 0.4);
-    padding: 50px; width: 100%; max-width: 480px;
-    text-align: center; animation: scaleIn 0.7s var(--ease);
+    padding: 50px 40px; /* Reduced side padding slightly, kept vertical padding */
+    width: 100%;
+    max-width: 420px;   /* Reduced max-width from 480px for a tighter login feel */
+    text-align: center;
+    animation: scaleIn 0.7s var(--ease);
 }
 
 /* Container for the Icon */
