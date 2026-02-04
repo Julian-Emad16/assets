@@ -39,10 +39,6 @@ const translations = {
         thPhone: "Phone",
         thStatus: "Status",
         thValue: "Value",
-        deleteTitle: "Confirm Delete",
-        deleteConfirmText: "Are you sure you want to delete this lead? This action cannot be undone.",
-        deleteBtn: "Delete",
-        deleteSuccess: "Deleted successfully",  
         thNotes: "Notes",
         currLabel: "EGY",
         phNotes: "Notes"
@@ -73,10 +69,6 @@ const translations = {
         thPhone: "الهاتف",
         thStatus: "الحالة",
         thValue: "القيمة", 
-        deleteTitle: "تأكيد الحذف",
-        deleteConfirmText: "هل أنت متأكد من حذف هذه البيانات؟ لا يمكن التراجع عن هذا الإجراء.",
-        deleteBtn: "حذف",
-        deleteSuccess: "تم الحذف بنجاح",
         thNotes: "ملاحظات",
         currLabel: "ج.م",
         phNotes: "ملاحظات"
